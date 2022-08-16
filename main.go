@@ -14,7 +14,7 @@
 
 // This program ensures source code files have copyright license headers.
 // See usage with "addlicense -h".
-package main
+package addlicense
 
 import (
 	"bytes"
@@ -122,6 +122,17 @@ func main() {
 		ignorePatterns = append(ignorePatterns, fmt.Sprintf("**/*.%s", s))
 	}
 
+	// map legacy license values
+	if t, ok := legacyLicenseTypes[*license]; ok {
+		*license = t
+	}
+
+	data := LicenseData{
+		Year:   *year,
+		Holder: *holder,
+		SPDXID: *license,
+	}
+
 	// create logger to print updates to stdout
 	logger := log.Default()
 
@@ -129,10 +140,8 @@ func main() {
 	err := Run(
 		ignorePatterns,
 		spdx,
-		*holder,
-		*license,
+		data,
 		*licensef,
-		*year,
 		*verbose,
 		*checkonly,
 		patterns,
@@ -144,14 +153,78 @@ func main() {
 	}
 }
 
+func validatePatterns(p []string) error {
+	invalidPatterns := []string{}
+	for _, p := range ignorePatterns {
+		if !doublestar.ValidatePattern(p) {
+			invalidPatterns = append(invalidPatterns, p)
+		}
+	}
+
+	if len(invalidPatterns) == 1 {
+		return fmt.Errorf("headerignore pattern %q is not valid", invalidPatterns[0])
+	} else if len(invalidPatterns) > 1 {
+		return fmt.Errorf("headerignore patterns %q are not valid", strings.Join(invalidPatterns[:], `, `))
+	}
+
+	return nil
+}
+
+// Temporary helper specifically for HashiCorp licenses
+// func AddHashiCorpLicense(ignorePatterns []string, spdxId string, year string, checkonly bool) error {
+// 		// verify that all ignorePatterns are valid
+// 		err := validatePatterns(ignorePatterns)
+// 		if err != nil {
+// 			return err
+// 		}
+//
+//
+//
+// 		tpl, err := fetchTemplate(license.SPDXID, licenseFileOverride, spdx)
+// 		if err != nil {
+// 			return err
+// 		}
+// 		t, err := template.New("").Parse(tpl)
+// 		if err != nil {
+// 			return err
+// 		}
+//
+// 		// process at most 1000 files in parallel
+// 		ch := make(chan *file, 1000)
+// 		done := make(chan struct{})
+// 		go func() {
+// 			var wg errgroup.Group
+// 			for f := range ch {
+// 				f := f // https://golang.org/doc/faq#closures_and_goroutines
+// 				wg.Go(func() error {
+// 					err := processFile(f, t, license, checkonly, verbose, logger)
+// 					return err
+// 				})
+// 			}
+// 			err := wg.Wait()
+// 			close(done)
+// 			if err != nil {
+// 				os.Exit(1)
+// 			}
+// 		}()
+//
+// 		for _, d := range patterns {
+// 			if err := walk(ch, d, logger); err != nil {
+// 				return err
+// 			}
+// 		}
+// 		close(ch)
+// 		<-done
+//
+// 		return nil
+// }
+
 // Run executes addLicense with supplied variables
 func Run(
-	ignorePatterns stringSlice,
+	ignorePatterns []string,
 	spdx spdxFlag,
-	holder string,
-	license string,
-	licensef string,
-	year string,
+	license LicenseData,
+	licenseFileOverride string, // Provide a file to use as the license header
 	verbose bool,
 	checkonly bool,
 	patterns []string,
@@ -159,24 +232,12 @@ func Run(
 ) error {
 
 	// verify that all ignorePatterns are valid
-	for _, p := range ignorePatterns {
-		if !doublestar.ValidatePattern(p) {
-			return fmt.Errorf("-ignore pattern %q is not valid", p)
-		}
+	err := validatePatterns(ignorePatterns)
+	if err != nil {
+		return err
 	}
 
-	// map legacy license values
-	if t, ok := legacyLicenseTypes[license]; ok {
-		license = t
-	}
-
-	data := licenseData{
-		Year:   year,
-		Holder: holder,
-		SPDXID: license,
-	}
-
-	tpl, err := fetchTemplate(license, licensef, spdx)
+	tpl, err := fetchTemplate(license.SPDXID, licenseFileOverride, spdx)
 	if err != nil {
 		return err
 	}
@@ -193,37 +254,8 @@ func Run(
 		for f := range ch {
 			f := f // https://golang.org/doc/faq#closures_and_goroutines
 			wg.Go(func() error {
-				if checkonly {
-					// Check if file extension is known
-					lic, err := licenseHeader(f.path, t, data)
-					if err != nil {
-						logger.Printf("%s: %v", f.path, err)
-						return err
-					}
-					if lic == nil { // Unknown fileExtension
-						return nil
-					}
-					// Check if file has a license
-					hasLicense, err := fileHasLicense(f.path)
-					if err != nil {
-						logger.Printf("%s: %v", f.path, err)
-						return err
-					}
-					if !hasLicense {
-						logger.Printf("%s\n", f.path)
-						return errors.New("missing license header")
-					}
-				} else {
-					modified, err := addLicense(f.path, f.mode, t, data)
-					if err != nil {
-						logger.Printf("%s: %v", f.path, err)
-						return err
-					}
-					if verbose && modified {
-						logger.Printf("%s modified", f.path)
-					}
-				}
-				return nil
+				err := processFile(f, t, license, checkonly, verbose, logger)
+				return err
 			})
 		}
 		err := wg.Wait()
@@ -241,6 +273,40 @@ func Run(
 	close(ch)
 	<-done
 
+	return nil
+}
+
+func processFile(f *file, t *template.Template, license LicenseData, checkonly bool, verbose bool, logger *log.Logger) error {
+	if checkonly {
+		// Check if file extension is known
+		lic, err := licenseHeader(f.path, t, license)
+		if err != nil {
+			logger.Printf("%s: %v", f.path, err)
+			return err
+		}
+		if lic == nil { // Unknown fileExtension
+			return nil
+		}
+		// Check if file has a license
+		hasLicense, err := fileHasLicense(f.path)
+		if err != nil {
+			logger.Printf("%s: %v", f.path, err)
+			return err
+		}
+		if !hasLicense {
+			logger.Printf("%s\n", f.path)
+			return errors.New("missing license header")
+		}
+	} else {
+		modified, err := addLicense(f.path, f.mode, t, license)
+		if err != nil {
+			logger.Printf("%s: %v", f.path, err)
+			return err
+		}
+		if verbose && modified {
+			logger.Printf("%s modified", f.path)
+		}
+	}
 	return nil
 }
 
@@ -282,7 +348,7 @@ func fileMatches(path string, patterns []string) bool {
 // addLicense add a license to the file if missing.
 //
 // It returns true if the file was updated.
-func addLicense(path string, fmode os.FileMode, tmpl *template.Template, data licenseData) (bool, error) {
+func addLicense(path string, fmode os.FileMode, tmpl *template.Template, data LicenseData) (bool, error) {
 	var lic []byte
 	var err error
 	lic, err = licenseHeader(path, tmpl, data)
@@ -323,7 +389,7 @@ func fileHasLicense(path string) (bool, error) {
 // licenseHeader populates the provided license template with data, and returns
 // it with the proper prefix for the file type specified by path. The file does
 // not need to actually exist, only its name is used to determine the prefix.
-func licenseHeader(path string, tmpl *template.Template, data licenseData) ([]byte, error) {
+func licenseHeader(path string, tmpl *template.Template, data LicenseData) ([]byte, error) {
 	var lic []byte
 	var err error
 	base := strings.ToLower(filepath.Base(path))

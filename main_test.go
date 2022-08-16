@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package addlicense
 
 import (
 	"io/ioutil"
@@ -223,7 +223,7 @@ func createTempFile(contents string, pattern string) (*os.File, error) {
 
 func TestAddLicense(t *testing.T) {
 	tmpl := template.Must(template.New("").Parse("{{.Holder}}{{.Year}}{{.SPDXID}}"))
-	data := licenseData{Holder: "H", Year: "Y", SPDXID: "S"}
+	data := LicenseData{Holder: "H", Year: "Y", SPDXID: "S"}
 
 	tests := []struct {
 		contents     string
@@ -293,7 +293,7 @@ func TestAddLicense(t *testing.T) {
 // different filenames and extensions.
 func TestLicenseHeader(t *testing.T) {
 	tpl := template.Must(template.New("").Parse("{{.Holder}}{{.Year}}{{.SPDXID}}"))
-	data := licenseData{Holder: "H", Year: "Y", SPDXID: "S"}
+	data := LicenseData{Holder: "H", Year: "Y", SPDXID: "S"}
 
 	tests := []struct {
 		paths []string // paths passed to licenseHeader

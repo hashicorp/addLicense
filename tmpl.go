@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package addlicense
 
 import (
 	"bufio"
@@ -39,8 +39,8 @@ var legacyLicenseTypes = map[string]string{
 	"mpl":    "MPL-2.0",
 }
 
-// licenseData specifies the data used to fill out a license template.
-type licenseData struct {
+// LicenseData specifies the data used to fill out a license template.
+type LicenseData struct {
 	Year   string // Copyright year(s).
 	Holder string // Name of the copyright holder.
 	SPDXID string // SPDX Identifier
@@ -81,7 +81,7 @@ func fetchTemplate(license string, templateFile string, spdx spdxFlag) (string, 
 
 // executeTemplate will execute a license template t with data d
 // and prefix the result with top, middle and bottom.
-func executeTemplate(t *template.Template, d licenseData, top, mid, bot string) ([]byte, error) {
+func executeTemplate(t *template.Template, d LicenseData, top, mid, bot string) ([]byte, error) {
 	var buf bytes.Buffer
 	if err := t.Execute(&buf, d); err != nil {
 		return nil, err

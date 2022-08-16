@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package addlicense
 
 import (
 	"errors"
@@ -142,31 +142,31 @@ func TestFetchTemplate(t *testing.T) {
 func TestExecuteTemplate(t *testing.T) {
 	tests := []struct {
 		template      string
-		data          licenseData
+		data          LicenseData
 		top, mid, bot string
 		want          string
 	}{
 		{
 			"",
-			licenseData{},
+			LicenseData{},
 			"", "", "",
 			"\n",
 		},
 		{
 			"{{.Holder}}{{.Year}}{{.SPDXID}}",
-			licenseData{Holder: "H", Year: "Y", SPDXID: "S"},
+			LicenseData{Holder: "H", Year: "Y", SPDXID: "S"},
 			"", "", "",
 			"HYS\n\n",
 		},
 		{
 			"{{.Holder}}{{.Year}}{{.SPDXID}}",
-			licenseData{Holder: "H", Year: "Y", SPDXID: "S"},
+			LicenseData{Holder: "H", Year: "Y", SPDXID: "S"},
 			"", "// ", "",
 			"// HYS\n\n",
 		},
 		{
 			"{{.Holder}}{{.Year}}{{.SPDXID}}",
-			licenseData{Holder: "H", Year: "Y", SPDXID: "S"},
+			LicenseData{Holder: "H", Year: "Y", SPDXID: "S"},
 			"/*", " * ", "*/",
 			"/*\n * HYS\n*/\n\n",
 		},
@@ -174,7 +174,7 @@ func TestExecuteTemplate(t *testing.T) {
 		// ensure we don't escape HTML characters by using the wrong template package
 		{
 			"{{.Holder}}",
-			licenseData{Holder: "A&Z"},
+			LicenseData{Holder: "A&Z"},
 			"", "", "",
 			"A&Z\n\n",
 		},
