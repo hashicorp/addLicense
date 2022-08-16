@@ -1,4 +1,4 @@
-module github.com/hashicorp/addlicense
+module github.com/hashicorp/addLicense
 
 go 1.13
 
