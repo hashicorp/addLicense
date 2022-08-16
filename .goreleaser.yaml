@@ -6,29 +6,24 @@ builds:
       - CGO_ENABLED=0
     goos:
       - linux
-      - windows
       - darwin
+      - windows
     goarch:
       - amd64
       - arm64
+    main: main.go
+    binary: addLicense
 archives:
-  - format_overrides:
+  - replacements:
+      amd64: x86_64
+    format_overrides:
     - goos: windows
       format: zip
-    replacements:
-      darwin: macOS
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
-    files:
-    - LICENSE
 checksum:
-  name_template: 'checksums.txt'
-snapshot:
-  name_template: "{{ incpatch .Tag }}-next"
-changelog:
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
+  name_template: 'SHA256SUMS'
+release:
+  github:
+    owner: hashicorp
+    name: addLicense
+  header: |
+    - Attached to this release are compressed builds of the `addLicense` client

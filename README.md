@@ -1,5 +1,7 @@
 # addlicense
 
+> :warning: This is an internally-maintained fork of github.com/google/addLicense
+
 The program ensures source code files have copyright license headers
 by scanning directory patterns recursively.
 
