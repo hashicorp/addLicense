@@ -308,16 +308,16 @@ func TestLicenseHeader(t *testing.T) {
 			"/*\n * HYS\n */\n\n",
 		},
 		{
-			[]string{"f.js", "f.mjs", "f.cjs", "f.jsx", "f.tsx", "f.css", "f.scss", "f.sass", "f.tf", "f.ts"},
+			[]string{"f.js", "f.mjs", "f.cjs", "f.jsx", "f.tsx", "f.css", "f.scss", "f.sass", "f.ts"},
 			"/**\n * HYS\n */\n\n",
 		},
 		{
-			[]string{"f.cc", "f.cpp", "f.cs", "f.go", "f.hcl", "f.hh", "f.hpp", "f.m", "f.mm", "f.proto",
+			[]string{"f.cc", "f.cpp", "f.cs", "f.go", "f.hh", "f.hpp", "f.m", "f.mm", "f.proto",
 				"f.rs", "f.swift", "f.dart", "f.groovy", "f.v", "f.sv", "f.php"},
 			"// HYS\n\n",
 		},
 		{
-			[]string{"f.py", "f.sh", ".bash", ".zsh", "f.yaml", "f.yml", "f.dockerfile", "dockerfile", "f.rb", "gemfile", ".ru", "f.tcl", "f.bzl", "f.pl", "f.pp", ".ps1", ".psd1", ".psm1", "f.nomad", "f.tfvars"},
+			[]string{"f.py", "f.sh", ".bash", ".zsh", "f.yaml", "f.yml", "f.dockerfile", "dockerfile", "f.rb", "gemfile", ".ru", "f.tcl", "f.bzl", "f.pl", "f.pp", "f.ps1", "f.psd1", "f.psm1", "f.hcl", "f.tf", "f.nomad", "f.tfvars"},
 			"# HYS\n\n",
 		},
 		{
