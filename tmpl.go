@@ -142,7 +142,7 @@ const tmplMPL = `This Source Code Form is subject to the terms of the Mozilla Pu
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.`
 
-const tmplSPDX = `{{ if and .Year .Holder }}Copyright {{.Year}} {{.Holder}}
-{{ end }}SPDX-License-Identifier: {{.SPDXID}}`
+const tmplSPDX = `Copyright (c){{ if .Year }} {{.Year}}{{ end }}{{ if .Holder }} {{.Holder}}{{ end }}
+{{ if .SPDXID }}SPDX-License-Identifier: {{.SPDXID}}{{ end }}`
 
 const spdxSuffix = "\n\nSPDX-License-Identifier: {{.SPDXID}}"
