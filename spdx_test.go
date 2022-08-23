@@ -7,7 +7,7 @@ import (
 func TestValidSPDX(t *testing.T) {
 	tests := []struct {
 		description    string // test case description
-		spdxId         string // SPDX ID passed to ValidSPDX()
+		spdxID         string // SPDX ID passed to ValidSPDX()
 		expectedOutput bool   // Whether the SPDX ID should be valid or not
 	}{
 		{
@@ -34,9 +34,9 @@ func TestValidSPDX(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			actualOutput := ValidSPDX(tt.spdxId)
+			actualOutput := ValidSPDX(tt.spdxID)
 			if tt.expectedOutput != actualOutput {
-				t.Fatalf("ValidSPDX(%q) returned %v, want %v", tt.spdxId, actualOutput, tt.expectedOutput)
+				t.Fatalf("ValidSPDX(%q) returned %v, want %v", tt.spdxID, actualOutput, tt.expectedOutput)
 			}
 		})
 	}
