@@ -159,9 +159,9 @@ func main() {
 	}
 }
 
-func validatePatterns(p []string) error {
+func validatePatterns(patterns []string) error {
 	invalidPatterns := []string{}
-	for _, p := range ignorePatterns {
+	for _, p := range patterns {
 		if !doublestar.ValidatePattern(p) {
 			invalidPatterns = append(invalidPatterns, p)
 		}
