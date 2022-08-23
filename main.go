@@ -149,7 +149,13 @@ func main() {
 	)
 
 	if err != nil {
-		log.Fatal(err)
+		if err.Error() == "missing license header" {
+			// this retains the historical behavior of addLicense, which is to give a
+			// non-zero exit code when the -check flag is used and headers are needed
+			os.Exit(1)
+		} else {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -249,6 +255,7 @@ func Run(
 	// process at most 1000 files in parallel
 	ch := make(chan *file, 1000)
 	done := make(chan struct{})
+	var out error
 	go func() {
 		var wg errgroup.Group
 		for f := range ch {
@@ -260,9 +267,7 @@ func Run(
 		}
 		err := wg.Wait()
 		close(done)
-		if err != nil {
-			os.Exit(1)
-		}
+		out = err
 	}()
 
 	for _, d := range patterns {
@@ -273,7 +278,7 @@ func Run(
 	close(ch)
 	<-done
 
-	return nil
+	return out
 }
 
 func processFile(f *file, t *template.Template, license LicenseData, checkonly bool, verbose bool, logger *log.Logger) error {
