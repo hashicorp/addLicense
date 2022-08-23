@@ -265,9 +265,8 @@ func Run(
 				return err
 			})
 		}
-		err := wg.Wait()
+		out = wg.Wait()
 		close(done)
-		out = err
 	}()
 
 	for _, d := range patterns {
