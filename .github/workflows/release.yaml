@@ -13,18 +13,20 @@ jobs:
     permissions:
       contents: write
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      -
-        name: Set up Go
+
+      - name: Configure git for private modules (hashicorp/addLicense)
+        run: git config --global url."https://git:${{ secrets.GITHUB_TOKEN }}@github.com".insteadOf "https://github.com"
+
+      - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      -
-        name: Run GoReleaser
+
+      - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@5a54d7e660bda43b405e8463261b3d25631ffe86 #v2.7.0
         with:
           distribution: goreleaser
