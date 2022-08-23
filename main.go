@@ -236,7 +236,6 @@ func Run(
 	patterns []string,
 	logger *log.Logger,
 ) error {
-
 	// verify that all ignorePatterns are valid
 	err := validatePatterns(ignorePatterns)
 	if err != nil {
