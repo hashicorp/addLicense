@@ -35,9 +35,9 @@ echo $licenses | jq '.licenses[] | select(.isDeprecatedLicenseId == false)' -c |
   name=$(jq '.name' -r <<< "$l")
   link=$(jq '.reference' -r <<< "$l")
   outfile ""
-  outfile "  // $name"
-  outfile "  // $link" 
-  outfile "  \"$id\","
+  outfile "	// $name"
+  outfile "	// $link" 
+  outfile "	\"$id\","
 done
 
 
@@ -56,3 +56,5 @@ func ValidSPDX(id string) bool {
 	return false
 }
 EOF
+
+go fmt $OUTPUT_FILE_PATH
