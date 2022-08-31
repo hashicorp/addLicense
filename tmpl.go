@@ -68,7 +68,9 @@ func fetchTemplate(license string, templateFile string, spdx spdxFlag) (string, 
 				// unknown license, but SPDX headers requested
 				t = tmplSPDX
 			} else {
-				return "", fmt.Errorf("unknown license: %q. Include the '-s' flag to request SPDX style headers using this license", license)
+				// unknown license and SPDX headers aren't request, proceed only with
+				// a copyright header and no license info
+				t = tmplCopyrightOnly
 			}
 		} else if spdx == spdxOn {
 			// append spdx headers to recognized license
@@ -144,5 +146,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.`
 
 const tmplSPDX = `Copyright (c){{ if .Year }} {{.Year}}{{ end }}{{ if .Holder }} {{.Holder}}{{ end }}
 {{ if .SPDXID }}SPDX-License-Identifier: {{.SPDXID}}{{ end }}`
+
+const tmplCopyrightOnly = `Copyright (c){{ if .Year }} {{.Year}}{{ end }}{{ if .Holder }} {{.Holder}}{{ end }}`
 
 const spdxSuffix = "\n\nSPDX-License-Identifier: {{.SPDXID}}"
