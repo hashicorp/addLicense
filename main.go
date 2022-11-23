@@ -227,7 +227,7 @@ func validatePatterns(patterns []string) error {
 
 // Run executes addLicense with supplied variables
 func Run(
-	ignorePatterns []string,
+	ignorePatternList []string,
 	spdx spdxFlag,
 	license LicenseData,
 	licenseFileOverride string, // Provide a file to use as the license header
@@ -237,10 +237,11 @@ func Run(
 	logger *log.Logger,
 ) error {
 	// verify that all ignorePatterns are valid
-	err := validatePatterns(ignorePatterns)
+	err := validatePatterns(ignorePatternList)
 	if err != nil {
 		return err
 	}
+	ignorePatterns = ignorePatternList
 
 	tpl, err := fetchTemplate(license.SPDXID, licenseFileOverride, spdx)
 	if err != nil {
