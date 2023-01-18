@@ -12,9 +12,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Configure git for private modules (hashicorp/addLicense)
-      run: git config --global url."https://git:${{ secrets.GITHUB_TOKEN }}@github.com".insteadOf "https://github.com"
-
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ matrix.go-version }}
