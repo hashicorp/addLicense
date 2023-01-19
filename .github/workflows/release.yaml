@@ -18,9 +18,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Configure git for private modules (hashicorp/addLicense)
-        run: git config --global url."https://git:${{ secrets.GITHUB_TOKEN }}@github.com".insteadOf "https://github.com"
-
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
