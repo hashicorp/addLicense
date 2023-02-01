@@ -333,6 +333,10 @@ func TestLicenseHeader(t *testing.T) {
 			"-- HYS\n\n",
 		},
 		{
+			[]string{"f.hbs"},
+			"{{!--\n HYS\n--}}\n\n",
+		},
+		{
 			[]string{"f.html", "f.htm", "f.xml", "f.vue", "f.wxi", "f.wxl", "f.wxs"},
 			"<!--\n HYS\n-->\n\n",
 		},
