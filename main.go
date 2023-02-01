@@ -176,55 +176,6 @@ func validatePatterns(patterns []string) error {
 	return nil
 }
 
-// Temporary helper specifically for HashiCorp licenses
-// func AddHashiCorpLicense(ignorePatterns []string, spdxId string, year string, checkonly bool) error {
-// 		// verify that all ignorePatterns are valid
-// 		err := validatePatterns(ignorePatterns)
-// 		if err != nil {
-// 			return err
-// 		}
-//
-//
-//
-// 		tpl, err := fetchTemplate(license.SPDXID, licenseFileOverride, spdx)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		t, err := template.New("").Parse(tpl)
-// 		if err != nil {
-// 			return err
-// 		}
-//
-// 		// process at most 1000 files in parallel
-// 		ch := make(chan *file, 1000)
-// 		done := make(chan struct{})
-// 		go func() {
-// 			var wg errgroup.Group
-// 			for f := range ch {
-// 				f := f // https://golang.org/doc/faq#closures_and_goroutines
-// 				wg.Go(func() error {
-// 					err := processFile(f, t, license, checkonly, verbose, logger)
-// 					return err
-// 				})
-// 			}
-// 			err := wg.Wait()
-// 			close(done)
-// 			if err != nil {
-// 				os.Exit(1)
-// 			}
-// 		}()
-//
-// 		for _, d := range patterns {
-// 			if err := walk(ch, d, logger); err != nil {
-// 				return err
-// 			}
-// 		}
-// 		close(ch)
-// 		<-done
-//
-// 		return nil
-// }
-
 // Run executes addLicense with supplied variables
 func Run(
 	ignorePatternList []string,
@@ -413,6 +364,8 @@ func licenseHeader(path string, tmpl *template.Template, data LicenseData) ([]by
 		lic, err = executeTemplate(tmpl, data, "", "% ", "")
 	case ".hs", ".sql", ".sdl":
 		lic, err = executeTemplate(tmpl, data, "", "-- ", "")
+	case ".hbs":
+		lic, err = executeTemplate(tmpl, data, "{{!--", "  ", "--}}")
 	case ".html", ".htm", ".xml", ".vue", ".wxi", ".wxl", ".wxs":
 		lic, err = executeTemplate(tmpl, data, "<!--", " ", "-->")
 	case ".php":
