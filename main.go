@@ -280,7 +280,8 @@ func walk(ch chan<- *file, start string, logger *log.Logger) error {
 			return nil
 		}
 		if fileMatches(path, ignorePatterns) {
-			logger.Printf("skipping: %s", path)
+			// The [DEBUG] level is inferred by go-hclog as a debug statement
+			logger.Printf("[DEBUG] skipping: %s", path)
 			return nil
 		}
 		ch <- &file{path, fi.Mode()}
