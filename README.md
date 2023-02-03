@@ -1,7 +1,12 @@
 # addlicense
 
-> :warning: This is an internally-maintained fork of github.com/google/addLicense.
-> It is meant only for HashiCorp usage and is not supported.
+**This repo has moved to https://github.com/hashicorp/copywrite/addlicense and
+no further contributions will show up here.**
+
+--
+
+:warning: This is an internally-maintained fork of github.com/google/addLicense.
+It is meant only for HashiCorp usage and is not supported.
 
 The program ensures source code files have copyright license headers
 by scanning directory patterns recursively.
